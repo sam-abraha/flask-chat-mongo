@@ -1,4 +1,4 @@
-<h1>Chat Room App</h1>
+<h1>Chat Room</h1>
 
 <p>A chat room web application designed to allow authenticated users to create chat rooms and exchange messages in real time.</p>
 
