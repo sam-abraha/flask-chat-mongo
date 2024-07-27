@@ -26,7 +26,7 @@
 <h3>Frontend</h3>
 
 <ul>
-	<li><strong>Framework:</strong>Tailwind</li>
+	<li><strong>Framework:</strong> Tailwind</li>
 	<li><strong>Language:</strong> HTML</li>
 </ul>
 
