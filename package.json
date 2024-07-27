@@ -1,0 +1,19 @@
+{
+  "name": "flask-chat",
+  "version": "1.0.0",
+  "description": "A Flask application with chat functionality.",
+  "main": "app.py",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "tailwindcss -i ./static/css/style.css -o ./static/css/tailwind.css"
+  },
+  "keywords": ["flask", "chat", "tailwindcss"],
+  "author": "Sam",
+  "license": "ISC",
+  "engines": {
+    "node": "18.x"
+  },
+  "devDependencies": {
+    "tailwindcss": "^2.2.19"
+  }
+}
