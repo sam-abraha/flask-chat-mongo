@@ -2,12 +2,10 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_socketio import join_room, leave_room, send, SocketIO
 from flask_login import current_user, login_required, login_user, LoginManager, logout_user
 from pymongo.errors import DuplicateKeyError
-import random
-from string import ascii_uppercase
 from db import save_user, get_user, get_user_by_id, save_room, get_room, update_room, delete_room, get_all_rooms
 from config import Config
 from auth_service import register_user, authenticate_user
-
+from room_service import create_new_room, can_join_room
 
 
 app = Flask(__name__)
@@ -21,11 +19,11 @@ login_manager.init_app(app)
 def load_user(user_id):
     return get_user_by_id(user_id)
 
-def create_room_code(length):
-    while True:
-        code = ''.join(random.choices(ascii_uppercase, k=length))
-        if not get_room(code):
-            return code
+#def create_room_code(length):
+#    while True:
+#        code = ''.join(random.choices(ascii_uppercase, k=length))
+#        if not get_room(code):
+#            return code
 
 @app.route("/logout")
 @login_required
@@ -82,15 +80,13 @@ def home():
             return render_template("home.html", error="Please enter a name.", code=code, name=name)
 
         if action == "create":
-            room_code = create_room_code(5)
+            room_code = create_new_room()
             save_room(room_code)
             session["room"] = room_code
         elif action == "join":
-            if not code:
-                return render_template("home.html", error="Please enter a room code.", code=code, name=name)
-            room = get_room(code)
-            if not room:
-                return render_template("home.html", error="Room does not exist.", code=code, name=name)
+            can_join, error = can_join_room(code)
+            if not can_join:
+                return render_template("home.html", error=error, code=code, name=name)
             session["room"] = code
         else:
             return render_template("home.html", error="Invalid action.", code=code, name=name)
