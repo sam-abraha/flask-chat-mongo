@@ -5,13 +5,12 @@ from pymongo.errors import DuplicateKeyError
 import random
 from string import ascii_uppercase
 from db import save_user, get_user, get_user_by_id, save_room, get_room, update_room, delete_room, get_all_rooms
-import os
-from dotenv import load_dotenv
+from config import Config
 
-load_dotenv()
+
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.getenv('SECRET_KEY')
+app.config["SECRET_KEY"] = Config.SECRET_KEY
 socketio = SocketIO(app, cors_allowed_origins="*")
 login_manager = LoginManager()
 login_manager.login_view = 'login'
