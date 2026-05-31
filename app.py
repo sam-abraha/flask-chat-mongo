@@ -40,8 +40,21 @@ def signup():
 
     error = ''
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+
+        if not username or not password:
+            error='Username and Password required'
+            return render_template('signup.html',error=error)
+        
+        if len(username) < 3:
+            error="Username must be at least 3 characters long"
+            return render_template('signup.html',error=error)
+        
+        if len(password) < 8:
+            error="Password must be at leat characters long"
+            return render_template('signup.html',error=error)
+
         try:
             save_user(username, password)
             return redirect(url_for('login'))
