@@ -69,15 +69,20 @@ def login():
 
     error = ''
     if request.method == 'POST':
-        username = request.form.get('username')
-        password_input = request.form.get('password')
+        username = request.form.get("username", "").strip()
+        password_input = request.form.get("password", "")
+
         user = get_user(username)
+
+        if not username or not password_input:
+            error = "Username and password are required"
+            return render_template("login.html", error=error)
 
         if user and user.check_password(password_input):
             login_user(user)
             return redirect(url_for('home'))
         else:
-            error = 'Failed to login!'
+            error = 'Invalid username or password'
     return render_template('login.html', error=error)
 
 @app.route("/", methods=["POST", "GET"])
