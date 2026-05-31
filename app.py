@@ -6,6 +6,7 @@ import random
 from string import ascii_uppercase
 from db import save_user, get_user, get_user_by_id, save_room, get_room, update_room, delete_room, get_all_rooms
 from config import Config
+from auth_service import register_user, authenticate_user
 
 
 
@@ -43,23 +44,11 @@ def signup():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
 
-        if not username or not password:
-            error='Username and Password required'
-            return render_template('signup.html',error=error)
-        
-        if len(username) < 3:
-            error="Username must be at least 3 characters long"
-            return render_template('signup.html',error=error)
-        
-        if len(password) < 8:
-            error="Password must be at leat characters long"
-            return render_template('signup.html',error=error)
+        success, error = register_user(username, password)
 
-        try:
-            save_user(username, password)
+        if success:
             return redirect(url_for('login'))
-        except ValueError as e:
-            error = str(e)
+
     return render_template('signup.html', error=error)
 
 @app.route("/login", methods=["POST", "GET"])
@@ -70,19 +59,13 @@ def login():
     error = ''
     if request.method == 'POST':
         username = request.form.get("username", "").strip()
-        password_input = request.form.get("password", "")
+        password = request.form.get("password", "")
 
-        user = get_user(username)
-
-        if not username or not password_input:
-            error = "Username and password are required"
-            return render_template("login.html", error=error)
-
-        if user and user.check_password(password_input):
+        user, error = authenticate_user(username, password)
+        
+        if user:
             login_user(user)
             return redirect(url_for('home'))
-        else:
-            error = 'Invalid username or password'
     return render_template('login.html', error=error)
 
 @app.route("/", methods=["POST", "GET"])
