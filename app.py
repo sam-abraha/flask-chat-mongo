@@ -145,6 +145,7 @@ def home():
             session["room"] = room_code
         elif action == "join":
             can_join, error = can_join_room(code)
+            logger.info(f"User {current_user.username} joined room {code}")
             if not can_join:
                 return render_template("home.html", error=error, code=code, name=name)
             session["room"] = code
