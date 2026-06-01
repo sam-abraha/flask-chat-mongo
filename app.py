@@ -10,6 +10,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from user_factory import get_user_by_id
+import logging
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
@@ -19,6 +20,12 @@ limiter = Limiter(
     app=app,
     default_limits=[]
 )
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 app.config.from_object(Config)
 app.config["SECRET_KEY"] = Config.SECRET_KEY
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -72,6 +79,7 @@ def login():
         
         if user:
             login_user(user)
+            logger.info(f"User logged in: {user.username}")
             return redirect(url_for('home'))
     return render_template('login.html', error=error)
 
@@ -88,6 +96,7 @@ def home():
             return render_template("home.html", error="Please enter a name.", code=code, name=name)
 
         if action == "create":
+            logger.info(f"Room created: {room_code} by user {current_user.username}")
             room_code = create_new_room(current_user.id)
             session["room"] = room_code
         elif action == "join":
@@ -124,6 +133,7 @@ def delete_current_room():
     success, error = delete_room_if_owner(room_code, current_user.id)
 
     if success:
+        logger.info(f"Room deleted: {room_code} by user {current_user.username}")
         socketio.emit(
             "room_deleted",
             {"message": "Room was deleted by the owner."},
@@ -154,6 +164,7 @@ def handle_message(data):
 
     content = create_message(name, message_text)
     send(content, to=room_code)
+    logger.info(f"Message sent in room {room_code} by {name}")
     save_message_to_room(room_code, content)
 
 @socketio.on("disconnect")
