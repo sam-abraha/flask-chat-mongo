@@ -10,3 +10,4 @@ gevent
 waitress
 flask-wtf
 prometheus-client
+flask-limiter
