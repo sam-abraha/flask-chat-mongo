@@ -39,6 +39,10 @@ login_manager.init_app(app)
 def load_user(user_id):
     return get_user_by_id(user_id)
 
+@app.route("/health")
+def health():
+    return {"status": "ok"}, 200
+
 @app.route("/logout")
 @login_required
 def logout():
