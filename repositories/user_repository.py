@@ -1,16 +1,14 @@
-from werkzeug.security import generate_password_hash
 from pymongo.errors import DuplicateKeyError
 from bson import ObjectId
 
 from db import users_collection
 
 def insert_user(username, password):
-    password_hash = generate_password_hash(password)
 
     try:
         users_collection.insert_one({
             "username": username,
-            "password_hash": password_hash
+            "password_hash": password
         })
     except DuplicateKeyError:
         raise ValueError("Username already exists")
