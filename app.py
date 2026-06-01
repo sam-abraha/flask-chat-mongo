@@ -107,7 +107,7 @@ def room():
     if not is_valid:
         return redirect(url_for("home"))
 
-    return render_template("room.html", code=room_code, messages=room.get("messages", []))
+    return render_template("room.html", code=room_code, room=room,messages=room.get("messages", []))
 
 @app.route("/room/delete", methods=["POST"])
 @login_required

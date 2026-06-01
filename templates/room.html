@@ -7,6 +7,7 @@
         <button type="submit" class="rounded-md bg-blue-500 py-2 px-4 border text-white  focus:border-indigo-500">
         <a href="{{ url_for('logout') }}">Logout</a>
         </button>
+        {% if room.owner_id == current_user.id|string %}
         <form method="POST" action="{{ url_for('delete_current_room') }}">
           <button
             type="submit"
@@ -15,6 +16,7 @@
             Delete Room        
           </button>
         </form>
+        {% endif %}
         </div>
         <div class="flex-1 overflow-y-scroll p-4 border border-gray-200 rounded-md" id="messages"></div>
         <div class="flex space-x-2">
