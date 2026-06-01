@@ -183,5 +183,24 @@ def handle_connect(auth):
     send({"name": name, "message": "entered the room"}, to=room_code)
     increment_room_members(room_code)
 
+@app.errorhandler(404)
+def not_found(error):
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(403)
+def forbidden(error):
+    return render_template("403.html"), 403
+
+
+@app.errorhandler(429)
+def ratelimit_handler(error):
+    return render_template("429.html"), 429
+
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return render_template("500.html"), 500
+
 if __name__ == "__main__":
     socketio.run(app, debug=True)
