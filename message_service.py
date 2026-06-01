@@ -1,4 +1,7 @@
-from db import get_room, update_room
+from repositories.room_repository import (
+    find_room_by_code,
+    update_room_by_code
+)
 
 
 def create_message(name, message_text):
@@ -9,7 +12,7 @@ def create_message(name, message_text):
 
 
 def save_message_to_room(room_code, message):
-    room = get_room(room_code)
+    room = find_room_by_code(room_code)
 
     if not room:
         return False
@@ -17,6 +20,6 @@ def save_message_to_room(room_code, message):
     messages = room.get("messages", [])
     messages.append(message)
 
-    update_room(room_code, {"messages": messages})
+    update_room_by_code(room_code, {"messages": messages})
 
     return True
