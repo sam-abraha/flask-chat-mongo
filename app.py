@@ -81,7 +81,7 @@ def home():
             return render_template("home.html", error="Please enter a name.", code=code, name=name)
 
         if action == "create":
-            room_code = create_new_room()
+            room_code = create_new_room(current_user.id)
             session["room"] = room_code
         elif action == "join":
             can_join, error = can_join_room(code)

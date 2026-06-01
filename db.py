@@ -75,9 +75,10 @@ def get_user_by_id(user_id):
     return None
 
 
-def save_room(room_code):
+def save_room(room_code, owner_id):
     rooms_collection.insert_one({
         "room_code": room_code,
+        "owner_id": str(owner_id),
         "members": 0,
         "messages": []
     })

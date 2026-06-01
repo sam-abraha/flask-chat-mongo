@@ -11,9 +11,9 @@ def create_room_code(length=5):
             return code
 
 
-def create_new_room():
+def create_new_room(owner_id):
     room_code = create_room_code()
-    save_room(room_code)
+    save_room(room_code, owner_id)
     return room_code
 
 
