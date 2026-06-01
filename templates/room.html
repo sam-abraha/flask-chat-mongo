@@ -5,9 +5,17 @@
       <div class="flex justify-around space-x-2">
         <h2 class="text-2xl font-semibold text-center">Chat Room: {{code}}</h2>
         <button type="submit" class="rounded-md bg-blue-500 py-2 px-4 border text-white  focus:border-indigo-500">
-          <a href="/logout">Logout</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
         </button>
-      </div>
+        <form method="POST" action="{{ url_for('delete_current_room') }}">
+          <button
+            type="submit"
+            style="background-color: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; border: none;"
+            >
+            Delete Room        
+          </button>
+        </form>
+        </div>
         <div class="flex-1 overflow-y-scroll p-4 border border-gray-200 rounded-md" id="messages"></div>
         <div class="flex space-x-2">
             <input

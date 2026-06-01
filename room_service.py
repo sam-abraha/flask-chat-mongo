@@ -1,6 +1,6 @@
 import random
 from string import ascii_uppercase
-from db import save_room, get_room, update_room
+from db import save_room, get_room, update_room, delete_room
 
 
 def create_room_code(length=5):
@@ -61,3 +61,15 @@ def validate_room_session(room_code, name):
         return False, None
 
     return True, room
+
+def delete_room_if_owner(room_code, user_id):
+    room = get_room(room_code)
+
+    if not room:
+        return False,"Room not found"
+    
+    if room.get("owner_id") != str(user_id):
+        return False,"You are not allowed to delete this room"
+    
+    delete_room(room_code)
+    return True, None

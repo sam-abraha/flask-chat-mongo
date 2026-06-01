@@ -5,7 +5,7 @@ from pymongo.errors import DuplicateKeyError
 from db import save_user, get_user, get_user_by_id, save_room, get_room, update_room, delete_room, get_all_rooms
 from config import Config
 from auth_service import register_user, authenticate_user
-from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members,validate_room_session
+from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members,validate_room_session,delete_room_if_owner
 from message_service import save_message_to_room, create_message
 from flask_login import login_required
 
@@ -108,6 +108,20 @@ def room():
         return redirect(url_for("home"))
 
     return render_template("room.html", code=room_code, messages=room.get("messages", []))
+
+@app.route("/room/delete", methods=["POST"])
+@login_required
+def delete_current_room():
+    room_code = session.get("room")
+
+    success, error = delete_room_if_owner(room_code, current_user.id)
+
+    if success:
+        session.pop("room", None)
+        session.pop("name", None)
+        return redirect(url_for("home"))
+
+    return redirect(url_for("room"))
 
 @socketio.on("message")
 def handle_message(data):
