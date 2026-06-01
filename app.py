@@ -4,8 +4,8 @@ from flask_login import current_user, login_required, login_user, LoginManager, 
 from pymongo.errors import PyMongoError
 from config import Config
 from auth_service import register_user, authenticate_user
-from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members,validate_room_session,delete_room_if_owner
-from message_service import save_message_to_room, create_message
+from services.room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members,validate_room_session,delete_room_if_owner
+from services.message_service import save_message_to_room, create_message
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
