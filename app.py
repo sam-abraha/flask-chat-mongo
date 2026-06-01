@@ -7,10 +7,10 @@ from config import Config
 from auth_service import register_user, authenticate_user
 from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members,validate_room_session,delete_room_if_owner
 from message_service import save_message_to_room, create_message
-from flask_login import login_required
-
+from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
+csrf = CSRFProtect(app)
 app.config["SECRET_KEY"] = Config.SECRET_KEY
 socketio = SocketIO(app, cors_allowed_origins="*")
 login_manager = LoginManager()
