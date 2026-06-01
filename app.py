@@ -2,7 +2,7 @@ from flask import Flask, flash, render_template, request, session, redirect, url
 from flask_socketio import join_room, leave_room, send, SocketIO
 from flask_login import current_user, login_required, login_user, LoginManager, logout_user
 from pymongo.errors import DuplicateKeyError
-from db import save_user, get_user, get_user_by_id, save_room, get_room, update_room, delete_room, get_all_rooms
+from db import save_user, get_user, save_room, get_room, update_room, delete_room, get_all_rooms
 from config import Config
 from auth_service import register_user, authenticate_user
 from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members,validate_room_session,delete_room_if_owner
@@ -10,6 +10,7 @@ from message_service import save_message_to_room, create_message
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from user_factory import get_user_by_id
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
