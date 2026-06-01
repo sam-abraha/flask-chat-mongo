@@ -2,7 +2,9 @@ from db import User
 from repositories.user_repository import (
     insert_user,
     find_user_by_username
+
 )
+from user_factory import create_user_from_data
 from werkzeug.security import generate_password_hash
 from validators import validate_username, validate_password
 
@@ -37,12 +39,8 @@ def authenticate_user(username, password):
 
     if not user_data:
         return None, "Invalid username or password"
-
-    user = User(
-        id=user_data["_id"],
-        username=user_data["username"],
-        password_hash=user_data["password_hash"]
-    )
+    
+    user = create_user_from_data(user_data)
 
     if user.check_password(password):
         return user, None
