@@ -5,7 +5,7 @@ from pymongo.errors import DuplicateKeyError
 from db import save_user, get_user, get_user_by_id, save_room, get_room, update_room, delete_room, get_all_rooms
 from config import Config
 from auth_service import register_user, authenticate_user
-from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members
+from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members,validate_room_session
 from message_service import save_message_to_room, create_message
 from flask_login import login_required
 
@@ -100,11 +100,11 @@ def home():
 @login_required
 def room():
     room_code = session.get("room")
-    if room_code is None or session.get("name") is None:
-        return redirect(url_for("home"))
+    name = session.get("name")
 
-    room = get_room(room_code)
-    if not room:
+    is_valid, room = validate_room_session(room_code, name)
+
+    if not is_valid:
         return redirect(url_for("home"))
 
     return render_template("room.html", code=room_code, messages=room.get("messages", []))

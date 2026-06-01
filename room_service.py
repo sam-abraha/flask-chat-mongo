@@ -50,3 +50,14 @@ def decrement_room_members(room_code):
     update_room(room_code, {"members": members})
 
     return True
+
+def validate_room_session(room_code, name):
+    if not room_code or not name:
+        return False, None
+
+    room = get_room(room_code)
+
+    if not room:
+        return False, None
+
+    return True, room
