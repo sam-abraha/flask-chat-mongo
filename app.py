@@ -1,7 +1,7 @@
 from flask import Flask, flash, render_template, request, session, redirect, url_for
 from flask_socketio import join_room, leave_room, send, SocketIO
 from flask_login import current_user, login_required, login_user, LoginManager, logout_user
-from pymongo.errors import DuplicateKeyError
+from pymongo.errors import PyMongoError
 from config import Config
 from auth_service import register_user, authenticate_user
 from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members,validate_room_session,delete_room_if_owner
@@ -11,6 +11,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from user_factory import get_user_by_id
 import logging
+from db import client
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
@@ -41,7 +42,22 @@ def load_user(user_id):
 
 @app.route("/health")
 def health():
-    return {"status": "ok"}, 200
+    try:
+        client.admin.command("ping")
+
+        return {
+            "status": "ok",
+            "database": "connected",
+            "service": "flask-chat",
+            "version": "1.0.0"
+        }, 200
+
+    except PyMongoError:
+        return {
+            "status": "error",
+            "database": "disconnected",
+            "service": "flask-chat"
+        }, 503
 
 @app.route("/logout")
 @login_required
