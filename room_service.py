@@ -1,6 +1,6 @@
 import random
 from string import ascii_uppercase
-from db import save_room, get_room
+from db import save_room, get_room, update_room
 
 
 def create_room_code(length=5):
@@ -27,3 +27,26 @@ def can_join_room(room_code):
         return False, "Room does not exist"
 
     return True, None
+
+def increment_room_members(room_code):
+    room = get_room(room_code)
+
+    if not room:
+        return False
+
+    members = room.get("members", 0) + 1
+    update_room(room_code, {"members": members})
+
+    return True
+
+
+def decrement_room_members(room_code):
+    room = get_room(room_code)
+
+    if not room:
+        return False
+
+    members = max(room.get("members", 1) - 1, 0)
+    update_room(room_code, {"members": members})
+
+    return True

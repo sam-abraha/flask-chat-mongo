@@ -5,7 +5,7 @@ from pymongo.errors import DuplicateKeyError
 from db import save_user, get_user, get_user_by_id, save_room, get_room, update_room, delete_room, get_all_rooms
 from config import Config
 from auth_service import register_user, authenticate_user
-from room_service import create_new_room, can_join_room
+from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members
 from message_service import save_message_to_room, create_message
 
 
@@ -131,10 +131,7 @@ def handle_disconnect():
     name = session.get("name")
     leave_room(room_code)
 
-    room = get_room(room_code)
-    if room:
-        members = max(room.get("members", 1) - 1, 0)
-        update_room(room_code, {"members": members})
+    decrement_room_members(room_code)
 
     send({"name": name, "message": "left the room"}, to=room_code)
 
@@ -147,11 +144,7 @@ def handle_connect(auth):
 
     join_room(room_code)
     send({"name": name, "message": "entered the room"}, to=room_code)
-
-    room = get_room(room_code)
-    if room:
-        room["members"] += 1
-        update_room(room_code, {"members": room["members"]})
+    increment_room_members(room_code)
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
