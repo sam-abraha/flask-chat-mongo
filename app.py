@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, flash, render_template, request, session, redirect, url_for
 from flask_socketio import join_room, leave_room, send, SocketIO
 from flask_login import current_user, login_required, login_user, LoginManager, logout_user
 from pymongo.errors import DuplicateKeyError
@@ -119,6 +119,7 @@ def delete_current_room():
     if success:
         session.pop("room", None)
         session.pop("name", None)
+        flash("Room deleted successfully.", "success")
         return redirect(url_for("home"))
 
     return redirect(url_for("room"))
