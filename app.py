@@ -6,6 +6,7 @@ from db import save_user, get_user, get_user_by_id, save_room, get_room, update_
 from config import Config
 from auth_service import register_user, authenticate_user
 from room_service import create_new_room, can_join_room
+from message_service import save_message_to_room, create_message
 
 
 app = Flask(__name__)
@@ -81,7 +82,6 @@ def home():
 
         if action == "create":
             room_code = create_new_room()
-            save_room(room_code)
             session["room"] = room_code
         elif action == "join":
             can_join, error = can_join_room(code)
@@ -111,20 +111,19 @@ def room():
 @socketio.on("message")
 def handle_message(data):
     room_code = session.get("room")
-    if not room_code:
+    name = session.get("name")
+
+    if not room_code or not name:
         return
 
-    content = {
-        "name": session.get("name"),
-        "message": data["data"]
-    }
-    send(content, to=room_code)
+    message_text = data.get("data")
 
-    # Append message to room in the database
-    room = get_room(room_code)
-    if room:
-        room["messages"].append(content)
-        update_room(room_code, {"messages": room["messages"]})
+    if not message_text:
+        return
+
+    content = create_message(name, message_text)
+    send(content, to=room_code)
+    save_message_to_room(room_code, content)
 
 @socketio.on("disconnect")
 def handle_disconnect():
@@ -134,11 +133,8 @@ def handle_disconnect():
 
     room = get_room(room_code)
     if room:
-        room["members"] -= 1
-        if room["members"] <= 0:
-            delete_room(room_code)
-        else:
-            update_room(room_code, {"members": room["members"]})
+        members = max(room.get("members", 1) - 1, 0)
+        update_room(room_code, {"members": members})
 
     send({"name": name, "message": "left the room"}, to=room_code)
 
