@@ -8,9 +8,18 @@ from auth_service import register_user, authenticate_user
 from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members,validate_room_session,delete_room_if_owner
 from message_service import save_message_to_room, create_message
 from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=[]
+)
+
 app.config["SECRET_KEY"] = Config.SECRET_KEY
 socketio = SocketIO(app, cors_allowed_origins="*")
 login_manager = LoginManager()
@@ -29,6 +38,7 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route("/signup", methods=["POST", "GET"])
+@limiter.limit("3 per Minute",methods=["POST"])
 def signup():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -46,6 +56,7 @@ def signup():
     return render_template('signup.html', error=error)
 
 @app.route("/login", methods=["POST", "GET"])
+@limiter.limit("5 per Minute",methods=["POST"])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
