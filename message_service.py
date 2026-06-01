@@ -2,12 +2,14 @@ from repositories.room_repository import (
     find_room_by_code,
     update_room_by_code
 )
+from datetime import datetime, timezone
 
 
 def create_message(name, message_text):
     return {
         "name": name,
-        "message": message_text
+        "message": message_text,
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
 
 
