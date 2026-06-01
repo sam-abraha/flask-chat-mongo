@@ -7,6 +7,7 @@ from config import Config
 from auth_service import register_user, authenticate_user
 from room_service import create_new_room, can_join_room, increment_room_members, decrement_room_members
 from message_service import save_message_to_room, create_message
+from flask_login import login_required
 
 
 app = Flask(__name__)
@@ -68,9 +69,8 @@ def login():
     return render_template('login.html', error=error)
 
 @app.route("/", methods=["POST", "GET"])
+@login_required
 def home():
-    if not current_user.is_authenticated:
-        return redirect(url_for('signup'))
 
     if request.method == "POST":
         name = request.form.get("name")
@@ -97,6 +97,7 @@ def home():
     return render_template("home.html")
 
 @app.route("/room")
+@login_required
 def room():
     room_code = session.get("room")
     if room_code is None or session.get("name") is None:
@@ -110,13 +111,16 @@ def room():
 
 @socketio.on("message")
 def handle_message(data):
+    if not current_user.is_authenticated:
+        return
     room_code = session.get("room")
     name = session.get("name")
 
     if not room_code or not name:
         return
 
-    message_text = data.get("data")
+    message_text = data.get("data", "").strip()
+
 
     if not message_text:
         return
@@ -127,7 +131,11 @@ def handle_message(data):
 
 @socketio.on("disconnect")
 def handle_disconnect():
+    if not current_user.is_authenticated:
+        return
     room_code = session.get("room")
+    if not room_code:
+        return
     name = session.get("name")
     leave_room(room_code)
 
@@ -137,6 +145,8 @@ def handle_disconnect():
 
 @socketio.on("connect")
 def handle_connect(auth):
+    if not current_user.is_authenticated:
+        return False
     room_code = session.get("room")
     name = session.get("name")
     if not room_code or not name:
