@@ -12,6 +12,7 @@ from flask_limiter.util import get_remote_address
 from user_factory import get_user_by_id
 import logging
 from db import client
+from prometheus_client import Counter, Gauge, generate_latest
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
@@ -25,8 +26,23 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
-
 logger = logging.getLogger(__name__)
+
+LOGIN_COUNTER = Counter(
+    "chat_login_total",
+    "Total successful logins"
+)
+
+MESSAGE_COUNTER = Counter(
+    "chat_messages_total",
+    "Total chat messages sent"
+)
+
+ACTIVE_ROOMS = Gauge(
+    "chat_active_rooms",
+    "Number of active rooms"
+)
+
 app.config.from_object(Config)
 app.config["SECRET_KEY"] = Config.SECRET_KEY
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -58,6 +74,12 @@ def health():
             "database": "disconnected",
             "service": "flask-chat"
         }, 503
+    
+@app.route("/metrics")
+def metrics():
+    return generate_latest(), 200, {
+        "Content-Type": "text/plain"
+    }
 
 @app.route("/logout")
 @login_required
@@ -99,6 +121,7 @@ def login():
         
         if user:
             login_user(user)
+            LOGIN_COUNTER.inc()
             logger.info(f"User logged in: {user.username}")
             return redirect(url_for('home'))
     return render_template('login.html', error=error)
@@ -116,8 +139,9 @@ def home():
             return render_template("home.html", error="Please enter a name.", code=code, name=name)
 
         if action == "create":
-            logger.info(f"Room created: {room_code} by user {current_user.username}")
             room_code = create_new_room(current_user.id)
+            logger.info(f"Room created: {room_code} by user {current_user.username}")
+            ACTIVE_ROOMS.inc()
             session["room"] = room_code
         elif action == "join":
             can_join, error = can_join_room(code)
@@ -162,6 +186,7 @@ def delete_current_room():
         session.pop("room", None)
         session.pop("name", None)
         flash("Room deleted successfully.", "success")
+        ACTIVE_ROOMS.dec()
         return redirect(url_for("home"))
 
     return redirect(url_for("room"))
@@ -186,6 +211,7 @@ def handle_message(data):
     send(content, to=room_code)
     logger.info(f"Message sent in room {room_code} by {name}")
     save_message_to_room(room_code, content)
+    MESSAGE_COUNTER.inc()
 
 @socketio.on("disconnect")
 def handle_disconnect():
