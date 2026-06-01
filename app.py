@@ -19,12 +19,14 @@ limiter = Limiter(
     app=app,
     default_limits=[]
 )
-
+app.config.from_object(Config)
 app.config["SECRET_KEY"] = Config.SECRET_KEY
 socketio = SocketIO(app, cors_allowed_origins="*")
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
+
+
 
 @login_manager.user_loader
 def load_user(user_id):
