@@ -37,6 +37,11 @@
 <script type="text/javascript">
   var socketio = io();
 
+  socketio.on("room_deleted", function(data) {
+        alert(data.message);
+        window.location.href = "{{ url_for('home') }}";
+    });
+
   const messages = document.getElementById("messages");
 
   const createMessage = (name, msg) => {
@@ -52,6 +57,7 @@
     `;
     messages.innerHTML += content;
   };
+  
 
   socketio.on("message", (data) => {
     createMessage(data.name, data.message);

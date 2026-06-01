@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <form method="post" class="bg-white p-6 rounded shadow-md space-y-4 w-full max-w-md">
+    <form method="POST" class="bg-white p-6 rounded shadow-md space-y-4 w-full max-w-md">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <h3 class="text-xl font-semibold">Login</h3>
         <div>

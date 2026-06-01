@@ -13,5 +13,8 @@
   },
   "devDependencies": {
     "tailwindcss": "^2.2.19"
+  },
+  "dependencies": {
+    "flask-wtf": "^0.0.1"
   }
 }

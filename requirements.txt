@@ -8,4 +8,4 @@ gunicorn
 eventlet
 gevent
 waitress
-flask_wtf
+flask-wtf

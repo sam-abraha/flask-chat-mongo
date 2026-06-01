@@ -21,12 +21,6 @@ login_manager.init_app(app)
 def load_user(user_id):
     return get_user_by_id(user_id)
 
-#def create_room_code(length):
-#    while True:
-#        code = ''.join(random.choices(ascii_uppercase, k=length))
-#        if not get_room(code):
-#            return code
-
 @app.route("/logout")
 @login_required
 def logout():
@@ -117,6 +111,11 @@ def delete_current_room():
     success, error = delete_room_if_owner(room_code, current_user.id)
 
     if success:
+        socketio.emit(
+            "room_deleted",
+            {"message": "Room was deleted by the owner."},
+            to=room_code
+        )
         session.pop("room", None)
         session.pop("name", None)
         flash("Room deleted successfully.", "success")
