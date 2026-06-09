@@ -9,7 +9,7 @@
   "author": "Sam",
   "license": "ISC",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "devDependencies": {
     "tailwindcss": "^2.2.19"
