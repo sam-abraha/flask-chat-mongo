@@ -5,9 +5,8 @@ pymongo
 werkzeug
 python-dotenv
 gunicorn
-eventlet
 gevent
-waitress
+gevent-websocket
 flask-wtf
 prometheus-client
 flask-limiter
